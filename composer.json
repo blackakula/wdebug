@@ -26,9 +26,11 @@
     "require": {
         "php": ">=5.4.0",
         "ext-json": "*",
+        "facebook/webdriver": "*"
+    },
+    "require-dev": {
         "claylo/selenium-server-standalone": ">=2.32.0",
-        "chrome/webdriver": ">=2.4",
-        "facebook/webdriver": "dev-master"
+        "chrome/webdriver": ">=2.4"
     },
     "autoload": {
         "psr-0": { "": ["src"] }
