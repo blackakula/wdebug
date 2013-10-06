@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug</title>
+</head>
+<style>
+    .row-element .actions {width: 100px}
+    .row-element .key {width: 160px}
+    .row-element .actions .action-link {margin-left: 8px}
+    .row-element .type {width: 120px}
+    .row-element .value input {width: 250px}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript">
+if (typeof(window.placeholders) == "undefined") {
+    window.placeholders = [];
+}
+if (typeof(window.locators) == "undefined") {
+    window.locators = {};
+}
+jQuery(function($) {
+    var Debug = {
+        addAction: function(className, html, action) {
+            $('<a></a>', {
+                "class": 'action-link ' + className,
+                href: '#',
+                html: html,
+                click: action
+            }).appendTo(this.row.find('.actions'));
+        },
+        pushChange: function(action, key, data) {
+            if (typeof(data) == "undefined") {
+                data = {};
+            }
+            $.extend(data, {
+                action: action,
+                key: key
+            });
+            window.actions.push(data);
+        },
+        deleteAction: function() {
+            if (this.isNew) {
+                this.addButton.show();
+            } else {
+                this.pushChange(this.deleteActionName, this.row.find('.key span').text());
+            }
+            this.row.remove();
+            if (!this.isNew) {
+                this.deleteActivities();
+            }
+            return false;
+        },
+        lightSubmit: function(hideLinkCallback, pushChangeCallback) {
+            var keyValue = this.row.find('.key input').val();
+            if (keyValue == '') {
+                return false;
+            }
+            if (this.isNew) {
+                this.addButton.show();
+            }
+            this.isNew = false;
+            hideLinkCallback();
+            pushChangeCallback();
+            this.row.find('.key span').text(keyValue);
+            this.row.find('.key span').show();
+            this.row.find('.key input').attr('type', 'hidden');
+            this.submitActivities();
+            return false;
+        },
+        submitAction: function(submitLink) {
+            var self = this;
+            this.lightSubmit(function() {$(submitLink).hide();}, function() {
+                self.pushChange(self.submitActionName, self.row.find('.key input').val(), self.getSubmitPushData());
+            });
+            return false;
+        },
+        initialize: function(data) {
+            this.row = $(this.rowHtml);
+            this.isNew = typeof(data) == "undefined";
+            var self = this;
+            this.addAction('action-delete', 'delete', function() {return self.deleteAction();})
+            this.addAction('action-submit', 'submit', function() {return self.submitAction(this);})
+            this.initializeSpecific(data);
+            if (this.isNew) {
+                this.row.find('.key span').hide();
+                this.row.find('.key input').attr('type', 'text');
+            } else {
+                this.row.find('.key input').val(this.getInitialKeyValue(data));
+                this.row.find('.actions .action-submit').hide();
+                this.row.find('.key span').show();
+                this.row.find('.key input').attr('type', 'hidden');
+                this.lightSubmit(function() {}, function() {});
+            }
+            this.row.appendTo(this.container);
+        },
+        addButtonClick: function(object) {
+            new DebugExtended(object);
+            $(this).parent().hide();
+            return false;
+        },
+        getKey: function(row) {
+            return $(row).find('.key span').text();
+        }
+    }
+    var DebugPlaceholder = {
+        addButton: $('#add-placeholder'),
+        deleteActionName: 'deletePlaceholder',
+        submitActionName: 'addPlaceholder',
+        container: $('#placeholders'),
+        rowHtml: $('#templates .row-placeholder')[0].outerHTML,
+        getSubmitPushData: function() {return {}},
+        getInitialKeyValue: function(key) {return key},
+        submitActivities: function() {DebugPlaceholder.replacePlaceholders()},
+        deleteActivities: function() {DebugPlaceholder.replacePlaceholders()},
+        initializeSpecific: function(key) {
+            this.row.find('.value input').change(DebugPlaceholder.replacePlaceholders);
+            this.row.find('.value input').keyup(DebugPlaceholder.replacePlaceholders);
+        },
+        replacePlaceholders: function() {
+            DebugLocator.container.find('.row-element').each(function(i, locator) {
+                DebugLocator.replacePlaceholders($(locator));
+            });
+        }
+    }
+    var DebugLocator = {
+        addButton: $('#add-locator'),
+        deleteActionName: 'deleteLocator',
+        submitActionName: 'setLocator',
+        container: $('#locators'),
+        rowHtml: $('#templates .row-locator')[0].outerHTML,
+        getSubmitPushData: function() {
+            return {
+                oldKey: this.row.find('.key span').text(),
+                locatorType: this.row.find('.type select').val(),
+                locatorValue: this.row.find('.value input').val()
+            };
+        },
+        getInitialKeyValue: function(data) {return data.key},
+        submitActivities: function() {
+            var typeSelect = this.row.find('.type select');
+            typeSelect.hide();
+            this.row.find('.type span, .value span').show();
+            this.row.find('.value input').attr('type', 'hidden');
+            this.row.find('.type span').text(typeSelect.val());
+            this.row.find('.actions .action-edit').show();
+            DebugLocator.replacePlaceholders(this.row);
+        },
+        deleteActivities: function() {},
+        initializeSpecific: function(data) {
+            var self = this;
+            var editActivities = function() {
+                self.row.find('.type select').show();
+                self.row.find('.type span, .key span, .value span').hide();
+                self.row.find('.key input, .value input').attr('type', 'text');
+                self.row.find('.actions .action-edit').hide();
+                self.row.find('.actions .action-submit').show();
+                return false;
+            }
+            this.addAction('action-edit', 'edit', editActivities);
+            if (this.isNew) {
+                editActivities();
+            } else {
+                this.row.find('.type select').val(data.type);
+                this.row.find('.value input').val(data.value);
+            }
+        },
+        replacePlaceholders: function(locatorRow) {
+            var locatorValue = locatorRow.find('.value input').val();
+            DebugPlaceholder.container.find('.row-element').each(function(i, placeholderRow) {
+                var placeholderKey = Debug.getKey(placeholderRow);
+                var placeholderValue = $(placeholderRow).find('.value input').val();
+                if (placeholderKey && placeholderValue) {
+                    locatorValue = locatorValue.replace('%' + placeholderKey + '%', placeholderValue);
+                }
+            });
+            locatorRow.find('.value span').text(locatorValue);
+        }
+    };
+    var DebugExtended = function(object, data) {
+        $.extend(this, object);
+        this.initialize(data);
+    }
+    DebugExtended.prototype = Debug;
+
+    $.each(window.placeholders, function(i, placeholder) {
+        new DebugExtended(DebugPlaceholder, placeholder);
+    });
+    $.each(window.locators, function(key, locator) {
+        new DebugExtended(DebugLocator, {key: key, type: locator[0], value: locator[1]});
+    });
+
+    DebugPlaceholder.addButton.find('a').click(function() {return Debug.addButtonClick.call(this, DebugPlaceholder)});
+    DebugLocator.addButton.find('a').click(function() {return Debug.addButtonClick.call(this, DebugLocator)});
+
+    window.actions = [];
+    $('#checker a').click(function() {
+        $('#checker').addClass('check');
+        return false;
+    });
+
+    $.extend(window, {
+        unmarkCheckRequest: function() {
+            $('#checker').removeClass('check');
+            return false;
+        },
+        isCheckRequested: function() {return $('#checker').hasClass('check')},
+        getPlaceholders: function() {
+            var placeholders = {};
+            DebugPlaceholder.container.find('.row-element').each(function(i, placeholderRow) {
+                var placeholderKey = Debug.getKey(placeholderRow);
+                if (placeholderKey) {
+                    placeholders[placeholderKey] = $(placeholderRow).find('.value input').val();
+                }
+            });
+            return placeholders;
+        },
+        popActions: function() {
+            var actions = window.actions;
+            window.actions = [];
+            return actions;
+        },
+        highlightLocators: function(missedLocators) {
+            DebugLocator.container.find('.row-element .key').each(function(i, locator) {
+                var isLocatorMissed = missedLocators.indexOf($(locator).find('span').text()) != -1;
+                $(locator).css('border', isLocatorMissed ? '1px solid red' : 'none');
+            });
+        },
+        isSingleChecker: function() {return $('input[name="single"]:checked').val() == '1';}
+    });
+    window.debugIsReady = true;
+});
+</script>
+<body>
+<table id="templates" style="display:none">
+    <tr class="row-element row-placeholder">
+        <td class="actions"></td>
+        <td class="key"><input type="hidden" value=""><span></span></td>
+        <td class="value"><input value=""></td>
+    </tr>
+    <tr class="row-element row-locator">
+        <td class="actions"></td>
+        <td class="type">
+            <select>
+                <option value="xpath">XPath</option>
+                <option value="css selector">CSS selector</option>
+                <option value="id">Element ID</option>
+                <option value="name">Element name</option>
+                <option value="class name">Class name</option>
+                <option value="tag name">Element tag</option>
+                <option value="link text">Link text</option>
+            </select>
+            <span></span>
+        </td>
+        <td class="key"><input type="hidden" value=""><span></span></td>
+        <td class="value"><input type="hidden" value=""><span></span></td>
+    </tr>
+</table>
+<a href="#" onclick="window.close()">Close window</a>
+<h3>Placeholders:</h3>
+<table id="placeholders">
+    <tr class="row-placeholder">
+        <th class="actions"></th>
+        <th class="key">Key</th>
+        <th class="value">Value</th>
+    </tr>
+</table>
+<div id="add-placeholder"><a href="#">Add placeholder</a></div>
+<h3>Locators:</h3>
+<table id="locators">
+    <tr class="row-locator">
+        <th class="actions"></th>
+        <th class="type">Type</th>
+        <th class="key">Key</th>
+        <th class="value">Value</th>
+    </tr>
+</table>
+<div id="add-locator"><a href="#">Add locator</a></div>
+<div>
+    <div>
+        <input type="radio" name="single" value="0" id="multiple-checker" checked="checked"/>
+        <label for="multiple-checker">Select <b>ALL</b> elements by locator</label>
+    </div>
+    <div>
+        <input type="radio" name="single" value="1" id="single-checker"/>
+        <label for="single-checker">Select <b>FIRST</b> element by locator</label>
+    </div>
+</div>
+<div id="checker"><a href="#">Check elements</a></div>
+</body>
+</html>
