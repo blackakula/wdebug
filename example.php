@@ -15,7 +15,7 @@
 include 'vendor/autoload.php';
 $host = 'http://localhost:4444/wd/hub';
 $capabilities = array(WebDriverCapabilityType::BROWSER_NAME => 'chrome');
-$driver = new Wdebug\RemoteWebDriver($host, $capabilities);
+$driver = new RemoteWebDriver($host, $capabilities);
 $driver->get('http://example.com/');
 $debugger = new Wdebug\Debug($driver);
 $debugger->execute();

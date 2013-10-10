@@ -26,7 +26,7 @@
     "require": {
         "php": ">=5.4.0",
         "ext-json": "*",
-        "facebook/webdriver": "*"
+        "facebook/webdriver": ">=0.2"
     },
     "require-dev": {
         "claylo/selenium-server-standalone": ">=2.32.0",
