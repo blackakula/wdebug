@@ -2,6 +2,7 @@
 =============
 * Switched to facebook/webdriver v0.2
 * Added documentation files
+* Changed callback interface
 
 0.1
 =============

@@ -18,6 +18,27 @@ $capabilities = array(WebDriverCapabilityType::BROWSER_NAME => 'chrome');
 $driver = new RemoteWebDriver($host, $capabilities);
 $driver->get('http://example.com/');
 $debugger = new Wdebug\Debug($driver);
-$debugger->execute();
+$debugger->execute(function ($type, $data) {
+    switch ($type) {
+        case 'deleteLocator':
+            echo 'Deleted locator "' . $data['key'] . "\"\n";
+            break;
+        case 'setLocator':
+            if (empty($data['oldKey'])) {
+                echo 'Added locator "' . $data['key'] . "\"\n";
+            } else {
+                echo 'Changed locator "' . $data['oldKey'] . '" -> "' . $data['key'] . "\"\n";
+            }
+            echo '  - type:  ' . $data['locatorType'] . "\n";
+            echo '  - value: ' . $data['locatorValue'] . "\n";
+            break;
+        case 'deletePlaceholder':
+            echo 'Deleted placeholder "' . $data['key'] . "\"\n";
+            break;
+        case 'addPlaceholder':
+            echo 'Added placeholder "' . $data['key'] . "\"\n";
+            break;
+    }
+});
 $driver->quit();
 

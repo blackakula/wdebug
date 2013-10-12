@@ -9,7 +9,7 @@ With this tool you can add, edit and remove locators during your automation scri
 
 Tool uses [facebook/webdriver](https://github.com/facebook/php-webdriver) bindings for PHP.
 
-See WDebug tool integrated with custom framework in action on youtube: http://www.youtube.com/watch?v=0-PTAFEce60.
+See WDebug tool integrated with custom framework in action on youtube: <http://www.youtube.com/watch?v=0-PTAFEce60>.
 
 ## Installation
 
@@ -25,6 +25,8 @@ See WDebug tool integrated with custom framework in action on youtube: http://ww
 
 3. Start using [facebook/webdriver](https://github.com/facebook/php-webdriver)
 
+4. See example.php for usage sample.
+
 ## Features
 
 See [the video](http://www.youtube.com/watch?v=0-PTAFEce60) for functional abilities.
@@ -32,4 +34,4 @@ See [the video](http://www.youtube.com/watch?v=0-PTAFEce60) for functional abili
 Tool consists of one class with 3 public methods
 
 * setStyle(), deleteStyle() are used to prepare custom styles for highlighting page elements.
-* execute() starts debugging tool: show popup and wait for user actions until popup is closed. Here you can pass callback on all user actions (add/delete locator/placeholder) to integrate tool with your custom framework.
+* execute() starts debugging tool: show popup and wait for user actions until popup is closed. Here you can pass callback on all user actions (add/delete locator/placeholder) to integrate tool with your custom framework. Interface of callback: function($type, array $data). See sample in example.php script.

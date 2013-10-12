@@ -204,7 +204,9 @@ class Debug
     {
         $actions = (array)$this->executeScriptFunction('popActions()');
         foreach ($actions as $action) {
-            switch ($action['action']) {
+            $actionType = $action['action'];
+            unset($action['action']);
+            switch ($actionType) {
                 case 'deleteLocator':
                     unset($this->locators[$action['key']]);
                     break;
@@ -214,7 +216,7 @@ class Debug
                     break;
             }
             if (isset($callback)) {
-                call_user_func($callback, $action);
+                call_user_func($callback, $actionType, $action);
             }
         }
     }

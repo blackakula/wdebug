@@ -17,7 +17,7 @@
                 "name": "chrome/webdriver",
                 "version": "2.4",
                 "dist": {
-                    "url": "https://chromedriver.googlecode.com/files/chromedriver_win32_2.3.zip",
+                    "url": "http://chromedriver.storage.googleapis.com/2.4/chromedriver_win32.zip",
                     "type": "zip"
                 }
             }
