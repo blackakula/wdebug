@@ -7,7 +7,7 @@
  *
  * @category    blackakula
  * @package     wdebug
- * @copyright   Copyright (c) Sergii Akulinin <blackakula@gmail.com>
+ * @copyright   Copyright (c) Sergii Kyrychenko <blackakula@gmail.com>
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Wdebug;

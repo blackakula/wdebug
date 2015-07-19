@@ -19,7 +19,7 @@ See WDebug tool integrated with custom framework in action on youtube: <http://w
 
         {
           "require": {
-            "blackakula/wdebug": ">=0.1"
+            "blackakula/wdebug": "1.*"
           }
         }
 

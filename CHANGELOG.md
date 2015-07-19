@@ -7,3 +7,7 @@
 0.1
 =============
 * Basic tool implementation
+
+1.0.0
+=============
+* Updated codebase for facebook/php-webdriver v1.0.1
