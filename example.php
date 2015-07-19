@@ -1,4 +1,5 @@
 <?php
+use \Facebook\WebDriver\Remote as FBRemote;
 /**
  * NOTICE OF LICENSE
  *
@@ -14,8 +15,7 @@
 # java -Dwebdriver.chrome.driver="W:\chromedriver.exe" -jar selenium-server-standalone-2.32.0.jar
 include 'vendor/autoload.php';
 $host = 'http://localhost:4444/wd/hub';
-$capabilities = array(WebDriverCapabilityType::BROWSER_NAME => 'chrome');
-$driver = new RemoteWebDriver($host, $capabilities);
+$driver = FBRemote\RemoteWebDriver::create($host, FBRemote\DesiredCapabilities::chrome());
 $driver->get('http://example.com/');
 $debugger = new Wdebug\Debug($driver);
 $debugger->execute(function ($type, $data) {

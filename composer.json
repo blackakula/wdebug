@@ -6,7 +6,7 @@
     "license": "OSL 3.0",
     "authors": [
         {
-            "name": "Sergii Akulinin",
+            "name": "Serhii Kyrychenko",
             "email": "blackakula@gmail.com"
         }
     ],
@@ -15,9 +15,9 @@
             "type": "package",
             "package": {
                 "name": "chrome/webdriver",
-                "version": "2.4",
+                "version": "2.16",
                 "dist": {
-                    "url": "http://chromedriver.storage.googleapis.com/2.4/chromedriver_win32.zip",
+                    "url": "http://chromedriver.storage.googleapis.com/2.16/chromedriver_win32.zip",
                     "type": "zip"
                 }
             }

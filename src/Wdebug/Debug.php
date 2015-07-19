@@ -11,6 +11,8 @@
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 namespace Wdebug;
+use Facebook\WebDriver\Remote\RemoteWebDriver;
+use Facebook\WebDriver;
 
 class Debug
 {
@@ -32,7 +34,7 @@ class Debug
     /**
      * Facebook web driver
      *
-     * @var \WebDriver
+     * @var \Facebook\WebDriver\Remote\RemoteWebDriver
      */
     protected $driver;
 
@@ -79,16 +81,16 @@ class Debug
     private $highlightingElements = array();
 
     /**
-     * @param \WebDriver $driver
+     * @param RemoteWebDriver $driver
      * @param array $locators $key => array($mechanism, $valueWithPlaceholders)
      * @param string[] $placeholders
      */
-    public function __construct(\WebDriver $driver, array $locators = array(), array $placeholders = array())
+    public function __construct(RemoteWebDriver $driver, array $locators = array(), array $placeholders = array())
     {
         $this->driver = $driver;
         $this->highlightingStyles = array(
-            'style.border' => function($key, \WebDriverBy $locator) {return '2px dashed blue';},
-            'title' => function ($key, \WebDriverBy $locator) {
+            'style.border' => function($key, WebDriver\WebDriverBy $locator) {return '2px dashed blue';},
+            'title' => function ($key, WebDriver\WebDriverBy $locator) {
                 return '"' . $key . '"[' . $locator->getMechanism() . ']: ' . $locator->getValue();
             }
         );
@@ -106,7 +108,7 @@ class Debug
     public function setStyle($key, $style)
     {
         if (!is_callable($style)) {
-            $style = function($key, \WebDriverBy $locator) use ($style) {return $style;};
+            $style = function($key, WebDriver\WebDriverBy $locator) use ($style) {return $style;};
         }
         $this->highlightingStyles[$key] = $style;
         return $this;
@@ -138,7 +140,7 @@ class Debug
             $isDebugging = true;
             try {
                 $this->processDebugActions($callback);
-            } catch (\WebDriverException $e) {
+            } catch (WebDriver\Exception\WebDriverException $e) {
                 $isDebugging = false;
             }
             if ((bool)$this->executeScriptFunction('isCheckRequested()')) {
@@ -160,7 +162,7 @@ class Debug
                         } else {
                             $missedLocators[] = $key;
                         }
-                    } catch (\WebDriverException $e) {
+                    } catch (WebDriver\Exception\WebDriverException $e) {
                         $missedLocators[] = $key;
                     }
                 }
@@ -189,7 +191,7 @@ class Debug
                 ' . self::WINDOW_VARIABLE . '.document.close();',
             array($this->placeholders, $this->locators)
         );
-        $wait = new \WebDriverWait($this->driver, self::POPUP_TIMEOUT);
+        $wait = new WebDriver\WebDriverWait($this->driver, self::POPUP_TIMEOUT);
         $wait->until(function () {
             return $this->isPopupReady();
         });
@@ -260,10 +262,10 @@ class Debug
      * Add an element to highlighted
      *
      * @param string $key
-     * @param \WebDriverBy $locator
-     * @param \WebDriverElement $element
+     * @param WebDriver\WebDriverBy $locator
+     * @param WebDriver\WebDriverElement $element
      */
-    private function addHighlightingElement($key, \WebDriverBy $locator, \WebDriverElement $element)
+    private function addHighlightingElement($key, WebDriver\WebDriverBy $locator, WebDriver\WebDriverElement $element)
     {
         $this->highlightingElements[] = array(
             'key'     => $key,
@@ -339,10 +341,10 @@ class Debug
      *
      * @param int $i
      * @param string $key
-     * @param \WebDriverBy $locator
+     * @param WebDriver\WebDriverBy $locator
      * @return string
      */
-    protected function setStylesDataScript($i, $key, \WebDriverBy $locator)
+    protected function setStylesDataScript($i, $key, WebDriver\WebDriverBy $locator)
     {
         $parts = array();
         foreach ($this->highlightingStyles as $style => $callback) {
@@ -371,7 +373,7 @@ class Debug
      * Get debugging locators
      *
      * @param array $placeholders
-     * @return \WebDriverBy[]
+     * @return WebDriver\WebDriverBy[]
      */
     protected function getDebuggingLocators(array $placeholders)
     {
@@ -390,7 +392,7 @@ class Debug
             /**#@+
              * Reflection crutch
              */
-            $webDriverByReflection = new \ReflectionClass('\WebDriverBy');
+            $webDriverByReflection = new \ReflectionClass('Facebook\\WebDriver\\WebDriverBy');
             $webDriverBy = $webDriverByReflection->newInstanceWithoutConstructor();
             $constructor = $webDriverByReflection->getConstructor();
             $constructor->setAccessible(true);
